@@ -1,0 +1,29 @@
+{
+  "name": "connectacl",
+  "version": "0.0.1",
+  "description": "Connect module that manages authorization using a ACL (Access Control Lists)",
+  "main": "connectacl.js",
+  "dependencies": {
+    "mysqlacl": "^0.0.1"
+  },
+  "devDependencies": {
+    "connectlight": "^0.0.2",
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gizur/connectacl.git"
+  },
+  "keywords": [
+    "ACL",
+    "Connect"
+  ],
+  "author": "Jonas Colmsjö",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gizur/connectacl/issues"
+  },
+  "homepage": "https://github.com/gizur/connectacl#readme"
+}
