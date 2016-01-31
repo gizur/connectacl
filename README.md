@@ -1,5 +1,4 @@
-Used by the tests: `npm install connect gzhelpers`
+Install with: `npm install`
 
-1. `source setenv`
-2. `node server.js`
-3. `node test.js`
+1. `node server.js`
+2. `source setenv; node test.js`
