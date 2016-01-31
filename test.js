@@ -13,8 +13,8 @@ var error = console.error.bind(console, 'ERROR');
 // =====
 
 var EMAIL = 'joe@example.com';
-var ACCOUNTID = 'accountid';
-var PASSWORD = 'password';
+var ACCOUNTID = process.env.ADMIN_USER; //'accountid';
+var PASSWORD = process.env. ADMIN_PASSWORD; //'password';
 var EMAIL2 = 'joe@example.com';
 var ACCOUNTID2 = 'accountid';
 var PASSWORD2 = 'password2';

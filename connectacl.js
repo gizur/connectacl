@@ -16,19 +16,30 @@
 // imports
 // ========
 
-var Acl = require('mysqlacl.js');
+var Acl = require('mysqlacl');
+
+// Setup logging
+// =============
+
+var log = console.log.bind(console);
+var debug = console.log.bind(console, 'DEBUG');
+var info = console.info.bind(console, 'INFO');
+var error = console.error.bind(console, 'ERROR');
 
 // Class definition
 // ================
 
 var A = function (table, options, handleError) {
+  if (!table || !options || !handleError)
+    throw new Error('table, options and handleError and mandatory!');
+
   this.table = table;
   this.options = options;
   this.handleError = handleError;
 };
 
 
-A.prototype.createOptions_(req) {
+A.prototype.createOptions_ = function (req) {
   return {
     host: this.options.host,
     user: req.headers.user,
@@ -37,20 +48,26 @@ A.prototype.createOptions_(req) {
   };
 }
 
-A.prototype.checkRequest = function (req, res, next) {
+A.prototype.getFunc = function () {
+  var self = this;
 
-  if (!req.headers.user || !req.headers.password) {
-    this.handleError(req, res);
-    next();
+  return function (req, res, next) {
+
+    if (!req.headers.user || !req.headers.password) {
+      self.handleError(req, res, next, 'Missing header user and/or password!');
+    }
+
+    var acl = new Acl(self.table, self.createOptions_(req));
+
+    acl.isAllowed(req.url, req.method, req.headers.user).then(function (res) {
+        if (!res) self.handleError(req, res, next, 'Operation now allowed');
+        next();
+      })
+      .catch(function (err) {
+        self.handleError(req, res, next, 'Internal error: ' + err);
+      });
+
   }
-
-  var acl = new Acl(this.table, this.createOptions_(req));
-
-  acl.isAllowed(req.url, req.method, req.headers.user).then(function (res) {
-    if (!res) this.handleError(req, res);
-    next();
-  });
-
 };
 
 // object should be something like: /account/bucket etc.

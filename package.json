@@ -4,10 +4,11 @@
   "description": "Connect module that manages authorization using a ACL (Access Control Lists)",
   "main": "connectacl.js",
   "dependencies": {
-    "mysqlacl": "^0.0.1"
+    "mysqlacl": "0.0.1"
   },
   "devDependencies": {
     "connectlight": "^0.0.2",
+    "gzhelpers": "^0.1.6"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
