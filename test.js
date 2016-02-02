@@ -12,12 +12,18 @@ var error = console.error.bind(console, 'ERROR');
 // Tests
 // =====
 
-var EMAIL = 'joe@example.com';
-var ACCOUNTID = process.env.ADMIN_USER; //'accountid';
-var PASSWORD = process.env. ADMIN_PASSWORD; //'password';
-var EMAIL2 = 'joe@example.com';
-var ACCOUNTID2 = 'accountid';
-var PASSWORD2 = 'password2';
+var A1 = {
+  email: 'john@example.com',
+  accountId: '1a51f7dab9af',
+  password: 'kF/QTtSmrydE'
+};
+
+var A2 = {
+  email: 'tine@example.com',
+  accountId: 'd72d36dd3d1b',
+  password: 'Wg+5EDqCYbxj'
+};
+
 var SYS_PATH = '/s';
 
 // Tests
@@ -38,17 +44,15 @@ var createOptions = function (accountId, password, path, method) {
 
 log('A web server should be running on localhost:3000');
 
-remote.request(createOptions(ACCOUNTID, PASSWORD, '/create_account', 'POST'), {
-    email: EMAIL
-  })
+remote.request(createOptions(A1.accountId, A1.password, '/help', 'GET'))
   .then(function (res) {
     log(res);
 
     // GRANT
     var path = '/accountid/s/grant';
-    return remote.request(createOptions(ACCOUNTID, PASSWORD, path, 'POST'), {
+    return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
       name: 'mytable', // previously tableName
-      accountId: ACCOUNTID2
+      accountId: A2.accountId
     });
   })
   .then(function (res) {
@@ -56,9 +60,9 @@ remote.request(createOptions(ACCOUNTID, PASSWORD, '/create_account', 'POST'), {
 
     // REVOKE
     var path = '/accountid/s/revoke';
-    return remote.request(createOptions(ACCOUNTID, PASSWORD, path, 'POST'), {
+    return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
       name: 'mytable', // previously tableName
-      accountId: ACCOUNTID2
+      accountId: A2.accountId
     });
   })
   .then(function (res) {
@@ -66,7 +70,7 @@ remote.request(createOptions(ACCOUNTID, PASSWORD, '/create_account', 'POST'), {
 
     // CREATE BUCKET
     var path = '/accountid/s/create_bucket';
-    return remote.request(createOptions(ACCOUNTID, PASSWORD, path, 'POST'), {
+    return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
       name: 'b_mybucket'
     });
   })
@@ -75,23 +79,22 @@ remote.request(createOptions(ACCOUNTID, PASSWORD, '/create_account', 'POST'), {
 
     // WRITE TO BUCKET
     var path = '/accountid/b_mybucket';
-    return remote.request(createOptions(ACCOUNTID, PASSWORD, path, 'POST'), 'Some data to write to the bucket...');
+    return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), 'Some data to write to the bucket...');
   })
   .then(function (res) {
     log(res);
 
     // SELECT FROM BUCKET
     var path = '/accountid/b_mybucket';
-    return remote.request(createOptions(ACCOUNTID, PASSWORD, path, 'GET'), null);
+    return remote.request(createOptions(A1.accountId, A1.password, path, 'GET'), null);
   })
   .then(function (res) {
     log(res);
 
     // DROP BUCKET
     var path = '/accountid/s/drop_bucket';
-    return remote.request(createOptions(ACCOUNTID, PASSWORD, path, 'POST'), {
+    return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
       name: 'b_mybucket'
     });
   })
   .done(log, log);
-

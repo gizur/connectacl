@@ -4,6 +4,7 @@
   "description": "Connect module that manages authorization using a ACL (Access Control Lists)",
   "main": "connectacl.js",
   "dependencies": {
+    "express": "^4.13.4",
     "mysqlacl": "0.0.1"
   },
   "devDependencies": {

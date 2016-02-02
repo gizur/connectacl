@@ -58,9 +58,10 @@ A.prototype.getFunc = function () {
     }
 
     var acl = new Acl(self.table, self.createOptions_(req));
+    acl.init();
 
-    acl.isAllowed(req.url, req.method, req.headers.user).then(function (res) {
-        if (!res) self.handleError(req, res, next, 'Operation now allowed');
+    acl.isAllowed(req.url, req.method, req.headers.user).then(function (result) {
+        if (!result) self.handleError(req, res, next, 'Operation not allowed');
         next();
       })
       .catch(function (err) {
@@ -73,13 +74,13 @@ A.prototype.getFunc = function () {
 // object should be something like: /account/bucket etc.
 A.prototype.grant = function (object, verb, role, req) {
   var acl = new Acl(this.table, this.createOptions_(req));
-  return acl.grant(objecy, verb, role);
+  return acl.grant(object, verb, role);
 };
 
 // object should be something like: /account/bucket etc.
 A.prototype.revoke = function (object, verb, role, req) {
   var acl = new Acl(this.table, this.createOptions_(req));
-  return acl.revoke(objecy, verb, role);
+  return acl.revoke(object, verb, role);
 };
 
 
