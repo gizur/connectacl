@@ -59,21 +59,35 @@ remote.request(createOptions(A1.accountId, A1.password, '/help', 'GET'))
   .then(function (res) {
     log(res);
 
-    // REVOKE
-    var path = '/' + A1.accountId + '/s/grant';
+    // CREATE BUCKET
+    var path = '/accountid/s/create_bucket';
     return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
-      name: 'mytable', // previously tableName
-      verbs: ['GET', 'POST', 'PUT', 'DELETE'],
-      accountId: A2.accountId
+      name: 'b_mybucket'
     });
   })
   .then(function (res) {
     log(res);
 
-    // CREATE BUCKET
-    var path = '/accountid/s/create_bucket';
+    // WRITE TO BUCKET
+    var path = '/accountid/b_mybucket';
+    return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), 'Some data to write to the bucket...');
+  })
+  .then(function (res) {
+    log(res);
+
+    // SELECT FROM BUCKET
+    var path = '/accountid/b_mybucket';
+    return remote.request(createOptions(A1.accountId, A1.password, path, 'GET'), null);
+  })
+  .then(function (res) {
+    log(res);
+
+    // REVOKE
+    var path = '/' + A1.accountId + '/s/revoke';
     return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
-      name: 'b_mybucket'
+      name: 'mytable', // previously tableName
+      verbs: ['GET', 'POST', 'PUT', 'DELETE'],
+      accountId: A2.accountId
     });
   })
   .then(function (res) {

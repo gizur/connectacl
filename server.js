@@ -40,56 +40,18 @@ var handleError = function (req, res, next, err) {
   error(err);
 };
 
-var checkHeadersAndParams = function (headers, params) {
-  return (headers.user && headers.password && params.accountid && params.accountid === headers.user);
-}
+var acl = new ConnectAcl('perms', {
+  host: 'localhost'
+}, handleError);
 
 // next is *not* called here, no further processing is required
-mws.use('/:accountid/s/grant', function (req, res, next) {
+mws.use('/:accountid/s/grant', acl.getGrantFunc());
 
-  if (!checkHeadersAndParams(req.headers, req.params)) {
-    handleError(req, res, next, 'Incorrect request headers or accountid! Make sure that the account' +
-      ' id of the object equals the credentials used! ' +
-      JSON.stringify(req.headers) + ":" +
-      JSON.stringify(req.params));
-    return;
-  }
+// next is *not* called here, no further processing is required
+mws.use('/:accountid/s/revoke', acl.getRevokeFunc());
 
-  var buffer = '';
-  req.on('data', function (chunk) {
-    chunk = chunk.toString();
-    buffer += chunk;
-  });
-
-  req.on('end', function () {
-    try {
-      var data = JSON.parse(buffer);
-
-      var acl = new ConnectAcl('perms', {
-        host: 'localhost',
-        user: data.accountId,
-        password: data.password
-      }, handleError);
-
-      var writeRes = function (result) {
-        debug(result)
-        res.write(JSON.stringify(result));
-        res.end();
-      };
-
-      acl.grant(data.name, data.verbs, req.params.accountid, req)
-        .then(writeRes, writeRes);
-
-    } catch (err) {
-      var result = {
-        error: 'ERROR parsing input, likely malformed/missing JSON: ' + err
-      };
-      res.write(JSON.stringify(result));
-      res.end();
-    }
-  });
-
-});
+// check permissions
+mws.use('/:accountid/:object', acl.getIsAllowedFunc());
 
 mws.use('/', function (req, res, next) {
   res.write('Unmatched request:' + req.url);

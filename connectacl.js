@@ -38,7 +38,6 @@ var A = function (table, options, handleError) {
   this.handleError = handleError;
 };
 
-
 A.prototype.createOptions_ = function (req) {
   return {
     host: this.options.host,
@@ -48,11 +47,10 @@ A.prototype.createOptions_ = function (req) {
   };
 }
 
-A.prototype.getFunc = function () {
+A.prototype.getIsAllowedFunc = function () {
   var self = this;
 
   return function (req, res, next) {
-
     if (!req.headers.user || !req.headers.password) {
       self.handleError(req, res, next, 'Missing header user and/or password!');
     }
@@ -61,26 +59,87 @@ A.prototype.getFunc = function () {
     acl.init();
 
     acl.isAllowed(req.url, req.method, req.headers.user).then(function (result) {
-        if (!result) self.handleError(req, res, next, 'Operation not allowed');
+        if (!result) {
+          self.handleError(req, res, next, 'Operation not allowed');
+          return;
+        }
         next();
       })
       .catch(function (err) {
         self.handleError(req, res, next, 'Internal error: ' + err);
       });
-
   }
 };
 
-// object should be something like: /account/bucket etc.
-A.prototype.grant = function (object, verbs, role, req) {
-  var acl = new Acl(this.table, this.createOptions_(req));
-  return acl.grant(object, verbs, role);
+/////////
+
+var checkHeadersAndParams = function (headers, params) {
+  return (headers.user && headers.password && params.accountid && params.accountid === headers.user);
+}
+
+var handleRequest = function (req, res) {
+  return new Promise(function (fullfil, reject) {
+
+    if (!checkHeadersAndParams(req.headers, req.params)) {
+      handleError(req, res, next, 'Incorrect request headers or accountid! Make sure that the account' +
+        ' id of the object equals the credentials used! ' +
+        JSON.stringify(req.headers) + ":" +
+        JSON.stringify(req.params));
+      reject('checkHeadersAndParams failed');
+      return;
+    }
+    var buffer = '';
+    req.on('data', function (chunk) {
+      chunk = chunk.toString();
+      buffer += chunk;
+    });
+
+    req.on('end', function () {
+      try {
+        var data = JSON.parse(buffer);
+        fullfil(data);
+      } catch (err) {
+        var result = {
+          error: 'ERROR parsing input, likely malformed/missing JSON: ' + err
+        };
+        res.write(JSON.stringify(result));
+        res.end();
+        reject(err);
+      }
+    });
+  });
 };
 
-// object should be something like: /account/bucket etc.
-A.prototype.revoke = function (object, verbs, role, req) {
-  var acl = new Acl(this.table, this.createOptions_(req));
-  return acl.revoke(object, verbs, role);
+var writeRes = function (res, result) {
+  debug(result)
+  res.write(JSON.stringify(result));
+  res.end();
+};
+
+A.prototype.getGrantFunc = function () {
+  var self = this;
+
+  return function (req, res, next) {
+    handleRequest(req, res)
+      .then(function (data) {
+        var acl = new Acl(self.table, self.createOptions_(req));
+        return acl.grant(data.name, data.verbs, req.params.accountid, req)
+      })
+      .then(writeRes.bind(this, res), writeRes.bind(this, res));
+  }
+};
+
+A.prototype.getRevokeFunc = function () {
+  var self = this;
+
+  return function (req, res, next) {
+    handleRequest(req, res)
+      .then(function (data) {
+        var acl = new Acl(self.table, self.createOptions_(req));
+        return acl.revoke(data.name, data.verbs, req.params.accountid, req)
+      })
+      .then(writeRes.bind(this, res), writeRes.bind(this, res));
+  }
 };
 
 
