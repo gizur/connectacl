@@ -1,7 +1,6 @@
 // imports
 // =======
 
-var ConnectLight = require('connectlight');
 var ConnectAcl = require('./connectacl.js');
 var express = require('express');
 
@@ -17,8 +16,7 @@ var debug = console.log.bind(console, 'DEBUG');
 // Main
 // ====
 
-var mws = express(); // the main app
-//var mws = new ConnectLight();
+var mws = express();
 
 // Just testing that the server is running
 mws.use('/help', function (req, res, next) {
