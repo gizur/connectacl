@@ -5,11 +5,11 @@
   "main": "connectacl.js",
   "dependencies": {
     "express": "^4.13.4",
-    "mysqlacl": "0.0.1"
+    "mysqlacl": "*"
   },
   "devDependencies": {
-    "connectlight": "^0.0.2",
-    "gzhelpers": "^0.1.6"
+    "connectlight": "*",
+    "gzhelpers": "*"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

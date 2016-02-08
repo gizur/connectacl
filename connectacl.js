@@ -72,15 +72,15 @@ A.prototype.getFunc = function () {
 };
 
 // object should be something like: /account/bucket etc.
-A.prototype.grant = function (object, verb, role, req) {
+A.prototype.grant = function (object, verbs, role, req) {
   var acl = new Acl(this.table, this.createOptions_(req));
-  return acl.grant(object, verb, role);
+  return acl.grant(object, verbs, role);
 };
 
 // object should be something like: /account/bucket etc.
-A.prototype.revoke = function (object, verb, role, req) {
+A.prototype.revoke = function (object, verbs, role, req) {
   var acl = new Acl(this.table, this.createOptions_(req));
-  return acl.revoke(object, verb, role);
+  return acl.revoke(object, verbs, role);
 };
 
 

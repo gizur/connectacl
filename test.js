@@ -49,9 +49,10 @@ remote.request(createOptions(A1.accountId, A1.password, '/help', 'GET'))
     log(res);
 
     // GRANT
-    var path = '/accountid/s/grant';
+    var path = '/' + A1.accountId + '/s/grant';
     return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
       name: 'mytable', // previously tableName
+      verbs: ['GET', 'POST', 'PUT', 'DELETE'],
       accountId: A2.accountId
     });
   })
@@ -59,9 +60,10 @@ remote.request(createOptions(A1.accountId, A1.password, '/help', 'GET'))
     log(res);
 
     // REVOKE
-    var path = '/accountid/s/revoke';
+    var path = '/' + A1.accountId + '/s/grant';
     return remote.request(createOptions(A1.accountId, A1.password, path, 'POST'), {
       name: 'mytable', // previously tableName
+      verbs: ['GET', 'POST', 'PUT', 'DELETE'],
       accountId: A2.accountId
     });
   })
